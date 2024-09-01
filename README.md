@@ -7,6 +7,7 @@
   This study involves a total of 1,758 patients, with each patient having three types of colposcopic image data and age textual data. After preprocessing, which includes resizing and contrast enhancement, the processed image size is 512×512. Data augmentation techniques were applied to increase the diversity of the dataset. The study is primarily focused on two objectives：predicting the severity of cervical lesions in patients and segmenting four types of lesion areas in colposcopic acetic acid-stained images.
   ![image](https://github.com/user-attachments/assets/748cab0f-40f5-43ef-ae92-13400eaeadf0)
 ![image](https://github.com/user-attachments/assets/41ef5a8e-3580-419a-9028-a47e2505ab94)
+fig(1)
 ![image](https://github.com/user-attachments/assets/822976a4-afef-499c-85b5-4b6f2f07b1e3)
 
 
