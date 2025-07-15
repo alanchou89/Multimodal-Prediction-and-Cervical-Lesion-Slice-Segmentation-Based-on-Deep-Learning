@@ -107,19 +107,18 @@ class DeeplabV3(object):
     #---------------------------------------------------#
     def detect_image(self, image, count=False, name_classes=None):
         #---------------------------------------------------------#
-        #   在这里将图像转换成RGB图像，防止灰度图在预测时报错。
-        #   代码仅仅支持RGB图像的预测，所有其它类型的图像都会转化成RGB
+        #   轉成RGB
         #---------------------------------------------------------#
         image       = cvtColor(image)
         #---------------------------------------------------#
-        #   对输入图像进行一个备份，后面用于绘图
+        #   對輸入圖像備份，後續用於繪圖
         #---------------------------------------------------#
         old_img     = copy.deepcopy(image)
         orininal_h  = np.array(image).shape[0]
         orininal_w  = np.array(image).shape[1]
         #---------------------------------------------------------#
-        #   给图像增加灰条，实现不失真的resize
-        #   也可以直接resize进行识别
+        #   給影像灰條，實現不失真的RESIZE
+        #   也可以直接resize進行識別
         #---------------------------------------------------------#
         image_data, nw, nh  = resize_image(image, (self.input_shape[1],self.input_shape[0]))
         #---------------------------------------------------------#
@@ -133,29 +132,29 @@ class DeeplabV3(object):
                 images = images.cuda()
                 
             #---------------------------------------------------#
-            #   图片传入网络进行预测
+            #   圖片傳入進行訓練
             #---------------------------------------------------#
             pr = self.net(images)[0]
             #---------------------------------------------------#
-            #   取出每一个像素点的种类
+            #   取出每一個像素點的種類
             #---------------------------------------------------#
             pr = F.softmax(pr.permute(1,2,0),dim = -1).cpu().numpy()
             #--------------------------------------#
-            #   将灰条部分截取掉
+            #   將灰調截取掉
             #--------------------------------------#
             pr = pr[int((self.input_shape[0] - nh) // 2) : int((self.input_shape[0] - nh) // 2 + nh), \
                     int((self.input_shape[1] - nw) // 2) : int((self.input_shape[1] - nw) // 2 + nw)]
             #---------------------------------------------------#
-            #   进行图片的resize
+            #   圖片resize
             #---------------------------------------------------#
             pr = cv2.resize(pr, (orininal_w, orininal_h), interpolation = cv2.INTER_LINEAR)
             #---------------------------------------------------#
-            #   取出每一个像素点的种类
+            #   取出每一个像素點的種類
             #---------------------------------------------------#
             pr = pr.argmax(axis=-1)
         
         #---------------------------------------------------------#
-        #   计数
+        #   COUNT
         #---------------------------------------------------------#
         if count:
             classes_nums        = np.zeros([self.num_classes])
@@ -180,11 +179,11 @@ class DeeplabV3(object):
             #     seg_img[:, :, 2] += ((pr[:, :] == c ) * self.colors[c][2]).astype('uint8')
             seg_img = np.reshape(np.array(self.colors, np.uint8)[np.reshape(pr, [-1])], [orininal_h, orininal_w, -1])
             #------------------------------------------------#
-            #   将新图片转换成Image的形式
+            #   江心圖片轉換成Image的形式
             #------------------------------------------------#
             image   = Image.fromarray(np.uint8(seg_img))
             #------------------------------------------------#
-            #   将新图与原图及进行混合
+            #   將新圖與原圖結合
             #------------------------------------------------#
             image   = Image.blend(old_img, image, 0.7)
 
@@ -196,14 +195,14 @@ class DeeplabV3(object):
             #     seg_img[:, :, 2] += ((pr[:, :] == c ) * self.colors[c][2]).astype('uint8')
             seg_img = np.reshape(np.array(self.colors, np.uint8)[np.reshape(pr, [-1])], [orininal_h, orininal_w, -1])
             #------------------------------------------------#
-            #   将新图片转换成Image的形式
+            #   將新圖片轉換成Image的形式
             #------------------------------------------------#
             image   = Image.fromarray(np.uint8(seg_img))
 
         elif self.mix_type == 2:
             seg_img = (np.expand_dims(pr != 0, -1) * np.array(old_img, np.float32)).astype('uint8')
             #------------------------------------------------#
-            #   将新图片转换成Image的形式
+            #   將新圖片轉換成Image的形式
             #------------------------------------------------#
             image = Image.fromarray(np.uint8(seg_img))
         
