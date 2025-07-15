@@ -13,46 +13,35 @@ from nets.deeplabv3_plus import DeepLab
 from utils.utils import cvtColor, preprocess_input, resize_image, show_config
 
 
-#-----------------------------------------------------------------------------------#
-#   使用自己训练好的模型预测需要修改3个参数
-#   model_path、backbone和num_classes都需要修改！
-#   如果出现shape不匹配，一定要注意训练时的model_path、backbone和num_classes的修改
-#-----------------------------------------------------------------------------------#
+
 class DeeplabV3(object):
     _defaults = {
-        #-------------------------------------------------------------------#
-        #   model_path指向logs文件夹下的权值文件
-        #   训练好后logs文件夹下存在多个权值文件，选择验证集损失较低的即可。
-        #   验证集损失较低不代表miou较高，仅代表该权值在验证集上泛化性能较好。
-        #-------------------------------------------------------------------#
+
     
         "model_path"        : r'C:\Semantic segmentation mode\deeplabv3+\logs\loss_59\log\best_epoch_weights.pth',             
         #"model_path"        : r'C:\deeplabv3_pytorch\logs\loss_43\log\ep050-loss0.384-val_loss0.461.pth', 
-        #----------------------------------------#
-        #   所需要区分的类的个数+1
-        #----------------------------------------#
+
         "num_classes"       : 5,
         #----------------------------------------#
-        #   所使用的的主干网络：
+        #   所使用的的主幹網路：
         #   mobilenet
         #   xception    
         #----------------------------------------#
         "backbone"          : "xception",
         #----------------------------------------#
-        #   输入图片的大小
+        #   輸入圖片的大小
         #----------------------------------------#
         "input_shape"       : [512, 512],
         #----------------------------------------#
-        #   下采样的倍数，一般可选的为8和16
-        #   与训练时设置的一样即可
+        #   下採樣倍數
         #----------------------------------------#
         "downsample_factor" : 16,
         #-------------------------------------------------#
         #   mix_type参数用于控制检测结果的可视化方式
         #
-        #   mix_type = 0 的时候代表原图与生成的图进行混合
-        #   mix_type = 1 的时候代表仅保留生成的图
-        #   mix_type = 2 的时候代表仅扣去背景，仅保留原图中的目标
+        #   mix_type = 0 的代表原圖與生成圖混合
+        #   mix_type = 1 的代表僅保留生成圖
+        #   mix_type = 2 的代表僅扣去背景，保留原圖中的目標
         #-------------------------------------------------#
         # "mix_type"          : 0,  #  Seg_Out 分割圖與原圖混合
         "mix_type"          : 1,  #  Seg_Out 僅分割圖
@@ -71,7 +60,7 @@ class DeeplabV3(object):
         for name, value in kwargs.items():
             setattr(self, name, value)
         #---------------------------------------------------#
-        #   画框设置不同的颜色
+        #   畫框設置不同顏色
         #---------------------------------------------------#
         if self.num_classes <= 21:
             self.colors = [ (0, 0, 0), (128, 128, 0), (128, 0, 0), (0, 128, 0), (0, 0, 128), (128, 0, 128), (0, 128, 128), 
@@ -89,18 +78,18 @@ class DeeplabV3(object):
             self.colors = list(map(lambda x: colorsys.hsv_to_rgb(*x), hsv_tuples))
             self.colors = list(map(lambda x: (int(x[0] * 255), int(x[1] * 255), int(x[2] * 255)), self.colors))
         #---------------------------------------------------#
-        #   获得模型
+        #   取得模型
         #---------------------------------------------------#
         self.generate()
         
         show_config(**self._defaults)
                     
     #---------------------------------------------------#
-    #   获得所有的分类
+    #   取得所有分類
     #---------------------------------------------------#
     def generate(self, onnx=False):
         #-------------------------------#
-        #   载入模型与权值
+        #   載入模型與權值
         #-------------------------------#
         self.net = DeepLab(num_classes=self.num_classes, backbone=self.backbone, downsample_factor=self.downsample_factor, pretrained=False)
 
@@ -114,7 +103,7 @@ class DeeplabV3(object):
                 self.net = self.net.cuda()
 
     #---------------------------------------------------#
-    #   检测图片
+    #   檢測圖片
     #---------------------------------------------------#
     def detect_image(self, image, count=False, name_classes=None):
         #---------------------------------------------------------#
